@@ -1,0 +1,52 @@
+{
+  "region": ${region},
+  "messageQueue": ${message_queue},
+  "storage" : {
+    "type": "databricks",
+    "host": ${databricks_host},
+    "password": ${databricks_password},
+    "catalog": "hive_metastore",
+    "schema": ${databricks_schema},
+    "port": ${databricks_port},
+    "httpPath": ${databricks_http_path},
+    "userAgent": "snowplow-rdbloader-oss",
+    "loadAuthMethod": {
+      "type": "TempCreds",
+      "roleArn": "${iam_role_arn}"
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "stdout": {
+      }
+      "period": "5 minutes"
+    },
+  },
+  "retries": {
+    "backoff": "30 seconds"
+    "strategy": "EXPONENTIAL"
+    "attempts": 3,
+    "cumulativeBound": "1 hour"
+  },
+  "readyCheck": {
+    "backoff": "15 seconds"
+    "strategy": "CONSTANT"
+  },
+  "initRetries": {
+    "backoff": "30 seconds"
+    "strategy": "EXPONENTIAL"
+    "attempts": 3,
+    "cumulativeBound": "1 hour"
+  },
+  "retryQueue": {
+    "period": "30 minutes",
+    "size": 64,
+    "maxAttempts": 3,
+    "interval": "5 seconds"
+  },
+  "timeouts": {
+    "loading": "1 hour",
+    "nonLoading": "10 minutes"
+    "sqsVisibility": "5 minutes"
+  }
+}
