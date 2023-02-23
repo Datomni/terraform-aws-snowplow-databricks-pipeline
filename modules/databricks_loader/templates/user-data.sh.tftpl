@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e -x
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+# -----------------------------------------------------------------------------
+#  BASE INSTALL
+# -----------------------------------------------------------------------------
+
+readonly CONFIG_DIR=/opt/databricks/config
+
+function install_docker_ce() {
+  sudo yum install -y docker-20.10.4-1.amzn2
+  sudo systemctl enable docker
+  sudo systemctl start docker
+  sudo usermod -a -G docker ec2-user
+}
+
+function get_instance_id() {
+  curl --silent --location "http://169.254.169.254/latest/meta-data/instance-id/"
+}
+
+install_docker_ce
+
+sudo mkdir -p $${CONFIG_DIR}
+sudo cat << EOF > $${CONFIG_DIR}/config.hocon
+${config}
+EOF
+
+sudo cat << EOF > $${CONFIG_DIR}/iglu_resolver.json
+${iglu_resolver}
+EOF
+
+# Launch the loader
+sudo docker run \
+  -d \
+  --name loader \
+  --restart always \
+  --network host \
+  --log-driver awslogs \
+  --log-opt awslogs-group=${cloudwatch_log_group_name} \
+  --log-opt awslogs-stream=$(get_instance_id) \
+  -v $${CONFIG_DIR}:/databricks/config \
+  -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
+  snowplow/rdb-loader-databricks:5.3.1 \
+  --config $(base64 -w 0 $CONFIG_DIR/config.hocon) \
+  --iglu-config $(base64 -w 0 $CONFIG_DIR/iglu_resolver.json)
