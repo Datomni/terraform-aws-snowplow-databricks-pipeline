@@ -90,6 +90,10 @@ variable "transformer_window_period_min" {
   default     = 5
 }
 
+variable "region" {
+  description = "AWS Region"
+  type = string
+}
 
 variable "tags" {
   description = "The tags to append to the resources"

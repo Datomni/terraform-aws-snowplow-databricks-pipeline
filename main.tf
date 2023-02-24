@@ -9,14 +9,14 @@ module "s3_pipeline_bucket" {
 }
 
 # Setup key for SSH into deployed servers
-resource "tls_private_key" "example" {
+resource "tls_private_key" "tls_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "pipeline" {
   key_name   = "snowplow-pipeline"
-  public_key = tls_private_key.example.public_key_openssh
+  public_key = tls_private_key.tls_key.public_key_openssh
 }
 
 # Deploy Kinesis streams
@@ -133,7 +133,7 @@ module "s3_loader_raw" {
   subnet_ids       = var.private_subnet_ids
   in_stream_name   = module.raw_stream.name
   bad_stream_name  = module.bad_1_stream.name
-  s3_bucket_name   = join("", module.s3_pipeline_bucket.*.id)
+  s3_bucket_name   = module.s3_pipeline_bucket.id
   s3_object_prefix = "raw/"
 
   ssh_key_name                = aws_key_pair.pipeline.key_name
@@ -154,7 +154,7 @@ module "s3_loader_bad" {
   subnet_ids       = var.private_subnet_ids
   in_stream_name   = module.bad_1_stream.name
   bad_stream_name  = module.bad_2_stream.name
-  s3_bucket_name   = join("", module.s3_pipeline_bucket.*.id)
+  s3_bucket_name   = module.s3_pipeline_bucket.id
   s3_object_prefix = "bad/"
 
   ssh_key_name                = aws_key_pair.pipeline.key_name
@@ -175,7 +175,7 @@ module "s3_loader_enriched" {
   subnet_ids       = var.private_subnet_ids
   in_stream_name   = module.enriched_stream.name
   bad_stream_name  = module.bad_1_stream.name
-  s3_bucket_name   = join("", module.s3_pipeline_bucket.*.id)
+  s3_bucket_name   = module.s3_pipeline_bucket.id
   s3_object_prefix = "enriched/"
 
   ssh_key_name                = aws_key_pair.pipeline.key_name
@@ -197,7 +197,7 @@ module "transformer_kinesis" {
   subnet_ids = var.private_subnet_ids
 
   stream_name             = module.enriched_stream.name
-  s3_bucket_name          = module.s3_pipeline_bucket.*.id
+  s3_bucket_name          = module.s3_pipeline_bucket.id
   s3_bucket_object_prefix = "transformed/good"
   window_period_min       = var.transformer_window_period_min
   sqs_queue_name          = aws_sqs_queue.message_queue.name

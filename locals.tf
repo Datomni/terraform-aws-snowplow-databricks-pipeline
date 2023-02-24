@@ -3,8 +3,8 @@ locals {
     {
       name            = "Iglu Server"
       priority        = 0
-      uri             = "${var.iglu_server_dns_name}/api"
-      api_key         = var.iglu_super_api_key
+      uri             = "${var.iglu_server_url}/api"
+      api_key         = var.iglu_server_apikey
       vendor_prefixes = []
     }
   ]

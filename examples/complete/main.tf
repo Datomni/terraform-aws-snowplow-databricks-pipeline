@@ -10,7 +10,7 @@ terraform {
 }
 
 module "snowplow-databricks-pipeline" {
-  source = "Datomni/snowplow-databricks-pipeline/aws"
+  source = "github.com/Datomni/terraform-aws-snowplow-databricks-pipeline"
 
   vpc_id             = var.vpc_id
   private_subnet_ids = var.private_subnet_ids
