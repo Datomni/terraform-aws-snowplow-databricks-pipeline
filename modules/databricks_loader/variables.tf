@@ -88,11 +88,6 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "region" {
-  description = "AWS Region"
-  type = string
-}
-
 variable "tags" {
   description = "The tags to append to the resources in this module"
   default     = {}
