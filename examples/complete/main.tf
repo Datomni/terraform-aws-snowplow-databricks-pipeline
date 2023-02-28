@@ -9,8 +9,12 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = "us-east-1"
+}
+
 module "snowplow-databricks-pipeline" {
-  source = "github.com/Datomni/terraform-aws-snowplow-databricks-pipeline"
+  source = "Datomni/snowplow-databricks-pipeline/aws"
 
   vpc_id             = var.vpc_id
   private_subnet_ids = var.private_subnet_ids

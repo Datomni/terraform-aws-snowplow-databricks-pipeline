@@ -1,4 +1,45 @@
 # terraform-aws-snowplow-databricks-pipeline
+## Overview
+A Terraform module which deploys a pipeline to load Snowplow data into Databricks using the [Snowplow Open Source](https://docs.snowplow.io/docs/getting-started-on-snowplow-open-source/what-is-snowplow-open-source/) artefacts.
+
+This module builds the Collector application, the Enrich application and the Databricks Loader.
+
+For more details on the Snowplow Pipeline, please visit their Official Documentation site:
+
+https://docs.snowplow.io/docs/understanding-your-pipeline/architecture-overview-aws/
+
+
+Databricks loader specific details and pre-requisites are documented here:
+
+https://docs.snowplow.io/docs/destinations/warehouses-and-lakes/rdb/loading-transformed-data/databricks-loader/#setting-up-databricks
+
+## Usage
+Import the module and provide the required configuration variables. 
+```
+module "snowplow-databricks-pipeline" {
+  source = "Datomni/snowplow-databricks-pipeline/aws"
+
+  vpc_id             = var.vpc_id
+  private_subnet_ids = var.private_subnet_ids
+  public_subnet_ids  = var.public_subnet_ids
+
+  s3_bucket_name = var.s3_bucket_name
+
+  databricks_host      = var.databricks_host
+  databricks_password  = var.databricks_password
+  databricks_schema    = var.databricks_schema
+  databricks_port      = var.databricks_port
+  databricks_http_path = var.databricks_http_path
+  iglu_server_url      = var.iglu_server_url
+  iglu_server_apikey   = var.iglu_server_apikey
+}
+```
+
+
+## Examples
+For a complete example, see [examples/complete](https://github.com/Datomni/terraform-aws-snowplow-databricks-pipeline/tree/main/examples/complete)
+
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -39,7 +80,7 @@
 |------|------|
 | [aws_key_pair.pipeline](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_sqs_queue.message_queue](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
-| [tls_private_key.example](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [tls_private_key.tls_key](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 
 ## Inputs
 
@@ -49,12 +90,12 @@
 | <a name="input_databricks_host"></a> [databricks\_host](#input\_databricks\_host) | Databricks Host | `string` | n/a | yes |
 | <a name="input_databricks_http_path"></a> [databricks\_http\_path](#input\_databricks\_http\_path) | Databricks http path | `string` | n/a | yes |
 | <a name="input_databricks_password"></a> [databricks\_password](#input\_databricks\_password) | Password for databricks\_loader\_user used by loader to perform loading | `string` | n/a | yes |
-| <a name="input_databricks_port"></a> [databricks\_port](#input\_databricks\_port) | Databricks port | `number` | n/a | yes |
+| <a name="input_databricks_port"></a> [databricks\_port](#input\_databricks\_port) | Databricks port | `number` | `443` | no |
 | <a name="input_databricks_schema"></a> [databricks\_schema](#input\_databricks\_schema) | Databricks schema name | `string` | n/a | yes |
 | <a name="input_iam_permissions_boundary"></a> [iam\_permissions\_boundary](#input\_iam\_permissions\_boundary) | The permissions boundary ARN to set on IAM roles created | `string` | `""` | no |
 | <a name="input_iglu_server_apikey"></a> [iglu\_server\_apikey](#input\_iglu\_server\_apikey) | Iglu Server API key | `string` | n/a | yes |
 | <a name="input_iglu_server_url"></a> [iglu\_server\_url](#input\_iglu\_server\_url) | Iglu Server url/dns | `string` | n/a | yes |
-| <a name="input_pipeline_kcl_write_max_capacity"></a> [pipeline\_kcl\_write\_max\_capacity](#input\_pipeline\_kcl\_write\_max\_capacity) | Increasing this is important to increase throughput at very high pipeline volumes | `number` | `50` | no |
+| <a name="input_pipeline_kcl_write_max_capacity"></a> [pipeline\_kcl\_write\_max\_capacity](#input\_pipeline\_kcl\_write\_max\_capacity) | Increasing this is important to increase throughput at very high pipeline volumes | `number` | `10` | no |
 | <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | The list of private subnets to deploy resources across | `list(string)` | n/a | yes |
 | <a name="input_public_subnet_ids"></a> [public\_subnet\_ids](#input\_public\_subnet\_ids) | The list of public subnets to deploy resources across | `list(string)` | n/a | yes |
 | <a name="input_s3_bucket_name"></a> [s3\_bucket\_name](#input\_s3\_bucket\_name) | S3 bucket with transformed snowplow events | `string` | n/a | yes |
@@ -65,5 +106,7 @@
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_collector_dns_name"></a> [collector\_dns\_name](#output\_collector\_dns\_name) | The ALB dns name for the Pipeline Collector |
 <!-- END_TF_DOCS -->

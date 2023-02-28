@@ -37,6 +37,7 @@ variable "databricks_schema" {
 variable "databricks_port" {
   description = "Databricks port"
   type        = number
+  default = 443
 }
 
 variable "databricks_http_path" {
@@ -81,7 +82,7 @@ variable "ssl_information" {
 variable "pipeline_kcl_write_max_capacity" {
   description = "Increasing this is important to increase throughput at very high pipeline volumes"
   type        = number
-  default     = 50
+  default     = 10
 }
 
 variable "transformer_window_period_min" {
