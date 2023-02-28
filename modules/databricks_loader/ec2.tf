@@ -61,7 +61,7 @@ resource "aws_launch_configuration" "lc" {
 resource "aws_autoscaling_group" "asg" {
   name = var.name
 
-  max_size = 1
+  max_size = 2
   min_size = 1
 
   launch_configuration = aws_launch_configuration.lc.name

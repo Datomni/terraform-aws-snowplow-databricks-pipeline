@@ -9,6 +9,10 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = "us-east-1"
+}
+
 module "snowplow-databricks-pipeline" {
   source = "Datomni/snowplow-databricks-pipeline/aws"
 
